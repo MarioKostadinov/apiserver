@@ -36,6 +36,10 @@ var City = mongoose.model("City", citySchema);
 //   }
 // }
 // );
+app.get('/', function(req, res){
+  res.end('hi');
+});
+
 
 app.post("/search", function(req, res){
 
@@ -66,10 +70,11 @@ app.post("/search", function(req, res){
 
 });
 
+httpServer.listen(8080, function(){
+  console.log('listening on 8080 http');
 
-app.listen(3000, function(){
-    // seedDB.deleteUsers();
-    // seedDB.createUsers();
-    // seedDB.generateSales();
-    console.log("Server started!");
+});
+httpsServer.listen(4000, function(){
+  console.log('listening on 4000 https');
+
 });
