@@ -3,16 +3,16 @@ var express     = require('express');
     mongoose    = require("mongoose"),
     app         = express(),
     fs          = require('fs'),
-    privateKey  = fs.readFileSync('key.pem', 'utf8'),
-    certificate = fs.readFileSync('cert.pem', 'utf8'),
-    cred        = {key: privateKey, cert: certificate},
+    // privateKey  = fs.readFileSync('key.pem', 'utf8'),
+    // certificate = fs.readFileSync('cert.pem', 'utf8'),
+    // cred        = {key: privateKey, cert: certificate},
     http        = require('http'),
     https       = require('https');
 
 var httpServer = http.createServer(app);
-var httpsServer = https.createServer(cred, app);
+// var httpsServer = https.createServer(cred, app);
 
-
+app.set("view engine", "ejs");
 app.use(express.static('public'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -37,44 +37,25 @@ var City = mongoose.model("City", citySchema);
 // }
 // );
 app.get('/', function(req, res){
-  res.end('hi');
+  res.render('index');
 });
 
 
-app.post("/search", function(req, res){
+app.get("/search", function(req, res){
+
+    let query = req.query.search;
 
     mongoose.connect("localhost", "cities");
     var cities = City.find({}, function(err, data){
-        console.log(data);
+        data.forEach(function(city){
+          if(query==city.city) {
+             res.render('search', {data:city});
+          }
+        });
     });
-
-    var data = [
-      {
-        city: "Coventry",
-        description: "Coventry Cathedral was built after the destruction of the 14th century cathedral church of Saint Michael by the Luftwaffe in the Coventry Blitz of 14 November 1940. Coventry motor companies have contributed significantly to the British motor industry. The city has two universities, Coventry University in the city centre and the University of Warwick on the southern outskirts."
-      },
-      {
-        city: "London",
-        description: "Capital city of the UK."
-      }
-    ];
-
-    data.forEach(function(city){
-
-      if(city.city === req.body.search){
-        res.render("search", {data: city});
-      }
-    });
-
-
-
 });
 
 httpServer.listen(8080, function(){
   console.log('listening on 8080 http');
-
-});
-httpsServer.listen(4000, function(){
-  console.log('listening on 4000 https');
 
 });
